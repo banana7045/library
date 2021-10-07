@@ -1,0 +1,128 @@
+import React, { Component } from 'react';
+import firebase from 'firebase';
+import db from '../config';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Platform,
+  StatusBar,
+  ImageBackground,
+  Image,
+  TextInput,
+  Alert,
+} from 'react-native';
+
+export default class BRScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userID: firebase.auth().currentUser.email,
+      bookName: '',
+      reasonToRequest: '',
+    };
+  }
+  addRequest = (bookName, reasonToRequest) => {
+    var userId = this.state.userId;
+    var randomRequestId = this.createUniqueId();
+    db.collection('requested_books').add({
+      user_id: userId,
+      book_name: bookName,
+      reason_to_request: reasonToRequest,
+      request_id: randomRequestId,
+    });
+    this.setState({ bookName: '', reasonToRequest: '' });
+    return Alert.alert('Book Requested Successfully');
+  };
+  createUniqueId() {
+    return Math.random().toString(36).substring(7);
+  }
+  render() {
+    return (
+      <View style={styles.container}>
+        <ImageBackground
+          source={require('../assets/5.png')}
+          style={styles.backgroundImage}>
+          <Text style={[styles.routeText, { paddingLeft: 92 }]}>
+            {' '}
+            Book Request{' '}
+          </Text>
+          <TextInput
+            style={[
+              styles.routeText,
+              {
+                marginTop: 50,
+                borderRadius: 10,
+                width: '99%',
+                height: 60,
+                alignSelf: 'center',
+              },
+            ]}
+            placeholder={'Enter your Book Name'}
+            onChangeText={(text) => {
+              this.setState({
+                bookName: text,
+              });
+            }}
+            value={this.state.bookName}></TextInput>
+          <TextInput
+            style={[
+              styles.routeText,
+              {
+                marginTop: 50,
+                borderRadius: 10,
+                width: '99%',
+                height: 200,
+                alignSelf: 'center',
+              },
+            ]}
+            placeholder={'Why do you need the book?'}
+            onChangeText={(text) => {
+              this.setState({
+                reasonToRequest: text,
+              });
+            }}
+                        value={this.state.reasonToRequest}></TextInput>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              this.addRequest(this.state.bookName, this.state.reasonToRequest);
+            }}>
+            <Text>Request</Text>
+          </TouchableOpacity>
+        </ImageBackground>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  backgroundImage: { flex: 1, resizeMode: 'cover' },
+
+  titletext: { fontSize: 34, fontWeight: 'bold', color: 'black' },
+  routeText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    marginTop: 0,
+    backgroundColor: 'white',
+  },
+  button: {
+    width: '75%',
+    height: 50,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'gold',
+    shadowColor: '#ffc800',
+    marginTop: 100,
+    marginLeft: 40,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.44,
+    shadowRadius: 10.32,
+    elevation: 15,
+  },
+});
